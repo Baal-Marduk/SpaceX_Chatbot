@@ -60,14 +60,20 @@ bot.on('conversationUpdate', function (message) {
 
 
 const menuItems = { // json des différentes options
-    "toto": {
+    "Next launch": {
         item: "option1"
     },
-    "titi": {
+    "Last launch": {
         item: "option2"
     },
-    "tutu": {
+    "All past launch": {
         item: "option3"
+    },
+    "All upcoming launch": {
+        item: "option4"
+    },
+    "All launch": {
+        item: "option5"
     }
 };
 
@@ -76,7 +82,7 @@ bot.dialog('menu', [
     function (session) {
 
         builder.Prompts.choice(session,
-            "Choose item option",
+            "Launch menu",
             menuItems,
             {listStyle: 3 })
     },
@@ -100,6 +106,18 @@ bot.dialog('option2', [
 ]);
 
 bot.dialog('option3', [
+    function (session) {
+        session.send('We are in the option 3 dialog !')
+    }
+]);
+
+bot.dialog('option4', [
+    function (session) {
+        session.send('We are in the option 3 dialog !')
+    }
+]);
+
+bot.dialog('option5', [
     function (session) {
         session.send('We are in the option 3 dialog !')
     }
