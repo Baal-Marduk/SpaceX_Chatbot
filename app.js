@@ -21,6 +21,9 @@ server.post('/api/messages', connector.listen());
 var inMemoryStorage = new builder.MemoryBotStorage();
 
 
+
+
+
 /** exercice 3 chat avec option recupérer d'un json. **/
 
 var bot = new builder.UniversalBot(connector, [
@@ -75,6 +78,8 @@ bot.dialog('menu', [
     // Step 1
     function (session) {
 
+        //builder.Prompt.text(session, 'Welcome to the chatbot Space X Morray');
+        session.send("Welcome to the chatbot Space X Morray");
         builder.Prompts.choice(session,
             "Choose item option",
             menuItems,
@@ -84,6 +89,14 @@ bot.dialog('menu', [
     function(session, results){
         var choice = results.response.entity;
         session.beginDialog(menuItems[choice].item);
+        //session.beginDialog('welcome');
+
+    }
+]);
+
+bot.dialog('welcome', [
+    function (session) {
+        builder.Prompt.text(session, 'Welcome to the chatbot Space X Morray');
     }
 ]);
 

@@ -11,6 +11,7 @@
   "dependencies": {
     "botbuilder": "^3.15.0",
     "dotenv": "^5.0.1",
-    "restify": "^7.2.1"
+    "restify": "^7.2.1",
+    "spacex-api-wrapper": "^1.0.1"
   }
 }
