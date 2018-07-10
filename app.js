@@ -1,6 +1,9 @@
 require('dotenv').config();
 var builder = require('botbuilder');
 var restify = require('restify');
+const SpaceXAPI = require('SpaceX-API-Wrapper');
+ 
+let SpaceX = new SpaceXAPI();
 
 
 var server = restify.createServer();
@@ -95,30 +98,40 @@ bot.dialog('menu', [
 
 bot.dialog('option1', [
     function (session) {
-        session.send('We are in the option 1 dialog !')
+        SpaceX.getCompanyInfo(function(err, info){
+            session.send(info);
+        });   
     }
 ]);
 
 bot.dialog('option2', [
     function (session) {
-        session.send('We are in the option 2 dialog !')
+        SpaceX.getLatestLaunch(function(err, info){
+            session.send(info)
+        });
     }
 ]);
 
 bot.dialog('option3', [
     function (session) {
-        session.send('We are in the option 3 dialog !')
+        SpaceX.getAllPastLaunches(filters, function(err, info){
+            session.send(info)
+        });
     }
 ]);
 
 bot.dialog('option4', [
     function (session) {
-        session.send('We are in the option 3 dialog !')
+        SpaceX.getAllUpcomingLaunches(filters, function(err, info){
+            session.send(info)
+        });
     }
 ]);
 
 bot.dialog('option5', [
     function (session) {
-        session.send('We are in the option 3 dialog !')
+        SpaceX.getAllLaunches(filters, function(err, info){
+            session.send(info)
+        });
     }
 ]);
