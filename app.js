@@ -5,7 +5,6 @@ const SpaceXAPI = require('SpaceX-API-Wrapper');
  
 let SpaceX = new SpaceXAPI();
 
-
 var server = restify.createServer();
 
 server.listen(process.env.PORT || 3978, function () {
@@ -112,7 +111,7 @@ bot.dialog('welcome', [
 bot.dialog('option1', [
     function (session) {
         SpaceX.getCompanyInfo(function(err, info){
-            session.send(info);
+            session.send(JSON.stringify(info));
         });   
     }
 ]);
@@ -135,7 +134,7 @@ bot.dialog('option3', [
 
 bot.dialog('option4', [
     function (session) {
-        SpaceX.getAllUpcomingLaunches(filters, function(err, info){
+        SpaceX.getAllUpcomingLaunches({}, function(err, info){
             session.send(info)
         });
     }
@@ -143,8 +142,8 @@ bot.dialog('option4', [
 
 bot.dialog('option5', [
     function (session) {
-        SpaceX.getAllLaunches(filters, function(err, info){
-            session.send(info)
+        SpaceX.getCompanyInfo(function(err, info){
+            session.send(JSON.stringify(info));
         });
     }
 ]);
