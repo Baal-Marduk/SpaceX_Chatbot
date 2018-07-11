@@ -13,5 +13,15 @@
     "dotenv": "^5.0.1",
     "restify": "^7.2.1",
     "spacex-api-wrapper": "^1.0.1"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Baal-Marduk/SpaceX_Chatbot.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Baal-Marduk/SpaceX_Chatbot/issues"
+  },
+  "homepage": "https://github.com/Baal-Marduk/SpaceX_Chatbot#readme",
+  "description": ""
 }

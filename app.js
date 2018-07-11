@@ -1,6 +1,9 @@
 require('dotenv').config();
 var builder = require('botbuilder');
 var restify = require('restify');
+const SpaceXAPI = require('SpaceX-API-Wrapper');
+ 
+let SpaceX = new SpaceXAPI();
 
 
 var server = restify.createServer();
@@ -63,14 +66,20 @@ bot.on('conversationUpdate', function (message) {
 
 
 const menuItems = { // json des différentes options
-    "toto": {
+    "Next launch": {
         item: "option1"
     },
-    "titi": {
+    "Last launch": {
         item: "option2"
     },
-    "tutu": {
+    "All past launch": {
         item: "option3"
+    },
+    "All upcoming launch": {
+        item: "option4"
+    },
+    "All launch": {
+        item: "option5"
     }
 };
 
@@ -81,7 +90,7 @@ bot.dialog('menu', [
         //builder.Prompt.text(session, 'Welcome to the chatbot Space X Morray');
         session.send("Welcome to the chatbot Space X Morray");
         builder.Prompts.choice(session,
-            "Choose item option",
+            "Launch menu",
             menuItems,
             {listStyle: 3 })
     },
@@ -102,18 +111,40 @@ bot.dialog('welcome', [
 
 bot.dialog('option1', [
     function (session) {
-        session.send('We are in the option 1 dialog !')
+        SpaceX.getCompanyInfo(function(err, info){
+            session.send(info);
+        });   
     }
 ]);
 
 bot.dialog('option2', [
     function (session) {
-        session.send('We are in the option 2 dialog !')
+        SpaceX.getLatestLaunch(function(err, info){
+            session.send(info)
+        });
     }
 ]);
 
 bot.dialog('option3', [
     function (session) {
-        session.send('We are in the option 3 dialog !')
+        SpaceX.getAllPastLaunches(filters, function(err, info){
+            session.send(info)
+        });
+    }
+]);
+
+bot.dialog('option4', [
+    function (session) {
+        SpaceX.getAllUpcomingLaunches(filters, function(err, info){
+            session.send(info)
+        });
+    }
+]);
+
+bot.dialog('option5', [
+    function (session) {
+        SpaceX.getAllLaunches(filters, function(err, info){
+            session.send(info)
+        });
     }
 ]);
