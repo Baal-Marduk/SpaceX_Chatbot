@@ -127,7 +127,7 @@ bot.dialog('option2', [
 
 bot.dialog('option3', [
     function (session) {
-        SpaceX.getAllPastLaunches(filters, function(err, info){
+        SpaceX.getAllPastLaunches({}, function(err, info){
             session.send(info)
         });
     }
