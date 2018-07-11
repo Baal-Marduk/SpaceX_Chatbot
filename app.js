@@ -235,30 +235,9 @@ bot.dialog('option1', [
                                 ],
                                 "actions": [
                                     {
-                                        "type": "Action.ShowCard",
-                                        "title": "Comment",
-                                        "card": {
-                                            "type": "AdaptiveCard",
-                                            "body": [
-                                                {
-                                                    "type": "Input.Text",
-                                                    "id": "comment",
-                                                    "isMultiline": true,
-                                                    "placeholder": "Enter your comment"
-                                                }
-                                            ],
-                                            "actions": [
-                                                {
-                                                    "type": "Action.Submit",
-                                                    "title": "OK"
-                                                }
-                                            ]
-                                        }
-                                    },
-                                    {
                                         "type": "Action.OpenUrl",
-                                        "title": "View",
-                                        "url": "http://adaptivecards.io"
+                                        "title": "More details",
+                                        "url": "http://www.spacex.com/"
                                     }
                                 ]
                             }
@@ -268,7 +247,7 @@ bot.dialog('option1', [
 
             //session.send(card);
             session.send(cardCompanyInfo);
-            session.send(JSON.stringify(info));
+            //session.send(JSON.stringify(info));
         });
     }
 ]);
