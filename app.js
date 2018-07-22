@@ -106,7 +106,129 @@ bot.dialog('option1', [
 bot.dialog('option2', [
     function (session) {
         SpaceX.getLatestLaunch(function(err, info){
-            session.send(info)
+            var card= {
+                "attachments": [
+                    {
+                        "contentType": "application/vnd.microsoft.card.adaptive",
+                        "content": {
+                            "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                            "type": "AdaptiveCard",
+                            "version": "1.0",
+                            "body": [
+                                {
+                                    "type": "Container",
+                                    "items": [
+                                        {
+                                            "type": "TextBlock",
+                                            "text": "Space X - Last Launch",
+                                            "weight": "bolder",
+                                            "size": "medium"
+                                        },
+                                        {
+                                            "type": "ColumnSet",
+                                            "columns": [
+                                                {
+                                                    "type": "Column",
+                                                    "width": "auto",
+                                                    "items": [
+                                                        {
+                                                            "type": "Image",
+                                                            "url": "",
+                                                            "size": "small",
+                                                            "style": "person"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "type": "Column",
+                                                    "width": "stretch",
+                                                    "items": [
+                                                        {
+                                                            "type": "TextBlock",
+                                                            "text": "Founder : "+info.founder,
+                                                            "weight": "bolder",
+                                                            "wrap": true
+                                                        },
+                                                        {
+                                                            "type": "TextBlock",
+                                                            "spacing": "none",
+                                                            "text": "Created {{DATE(2002-03-02T06:08:39Z, SHORT)}}",
+                                                            "isSubtle": true,
+                                                            "wrap": true
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "Container",
+                                    "items": [
+                                        {
+                                            "type": "TextBlock",
+                                            "text": info.summary,
+                                            "wrap": true
+                                        },
+                                        {
+                                            "type": "FactSet",
+                                            "facts": [
+                                                {
+                                                    "title": "Adress:",
+                                                    "value": info.headquarters.address+', '+info.headquarters.city+', '+info.headquarters.state,
+                                                },
+                                                {
+                                                    "title": "Employees:",
+                                                    "value": info.employees,
+                                                },
+                                                {
+                                                    "title": "Launch sites:",
+                                                    "value": info.launch_sites,
+                                                },
+                                                {
+                                                    "title": "Vehicles:",
+                                                    "value": info.vehicles,
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ],
+                            "actions": [
+                                {
+                                    "type": "Action.ShowCard",
+                                    "title": "Comment",
+                                    "card": {
+                                        "type": "AdaptiveCard",
+                                        "body": [
+                                            {
+                                                "type": "Input.Text",
+                                                "id": "comment",
+                                                "isMultiline": true,
+                                                "placeholder": "Enter your comment"
+                                            }
+                                        ],
+                                        "actions": [
+                                            {
+                                                "type": "Action.Submit",
+                                                "title": "OK"
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "type": "Action.OpenUrl",
+                                    "title": "View",
+                                    "url": "http://adaptivecards.io"
+                                }
+                            ]
+                        }
+                    }
+                ]
+};
+            var msg = new builder.Message(session).addAttachment(card);
+            session.send(msg);
+            //session.send(JSON.stringify(info));
         });
     }
 ]);
@@ -114,7 +236,7 @@ bot.dialog('option2', [
 bot.dialog('option3', [
     function (session) {
         SpaceX.getAllPastLaunches({}, function(err, info){
-            session.send(info)
+            session.send(JSON.stringify(info));
         });
     }
 ]);
@@ -122,7 +244,7 @@ bot.dialog('option3', [
 bot.dialog('option4', [
     function (session) {
         SpaceX.getAllUpcomingLaunches({}, function(err, info){
-            session.send(info)
+            session.send(JSON.stringify(info));
         });
     }
 ]);
@@ -134,3 +256,7 @@ bot.dialog('option5', [
         });
     }
 ]);
+
+function createCard(){
+
+}
