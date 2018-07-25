@@ -83,7 +83,9 @@ class SpaceX {
     getLatestLaunch(callback) {
         this.get('/launches/latest', null, callback);
     }
-
+    getNextLaunch(id, callback) {
+        this.get('/launches/next', null, callback);
+    }
     getAllLaunches(filters, callback) {
         this.get('/launches/all', filters, callback);
     }

@@ -1,4 +1,5 @@
 //import { ListStyle } from 'botbuilder';
+//import SpaceX from 'Services/spacex'
 
 require('dotenv').config();
 var builder = require('botbuilder');
@@ -48,6 +49,9 @@ var menuItems = {
     "Latest launch": {
         item: "latestLaunch",
     },
+    "Next launch": {
+        item: "nextLaunch",
+    },
     "All successuful launches": {
         item: "successufulLaunches",
     },
@@ -57,7 +61,7 @@ bot.dialog('menu', [
     //step 1    
     function (session) {
         builder.Prompts.choice(session,
-            "Voilà ce que je peux faire pour toi",
+            "Click on the buttons to have an information about Space X :",
             menuItems,
             { listStyle: 3 }
         );
@@ -175,6 +179,17 @@ bot.dialog('getCompanyInfo', [
         });
     }
 ]);
+bot.dialog('nextLaunch', [
+    function (session) {
+        session.sendTyping();
+        SpaceX.getNextLaunch(function (err, launch) {
+            var adaptiveCardMessage = buildLaunchAdaptiveCard(launch, session);
+            session.send(JSON.stringify(launch));
+            //session.send(adaptiveCardMessage);
+        });
+    },
+]);
+
 bot.dialog('latestLaunch', [
     function (session) {
         session.sendTyping();
