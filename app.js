@@ -1,40 +1,35 @@
+//import { ListStyle } from 'botbuilder';
+
 require('dotenv').config();
 var builder = require('botbuilder');
 var restify = require('restify');
-const SpaceXAPI = require('SpaceX-API-Wrapper');
 
+// var spacexClient = require('./Services/spacex')
+// let spacex = new spacexClient();
+const SpaceXAPI = require('SpaceX-API-Wrapper');
 let SpaceX = new SpaceXAPI();
 
-var server = restify.createServer();
 
+
+var server = restify.createServer();
 server.listen(process.env.PORT || 3978, function () {
-    console.log("Serveur en écoute");
+    console.log("serveur", server.name, "démarré");
 });
 
-//Create chat connector for communicating with the Bot Framwork Service
 var connector = new builder.ChatConnector({
     appId: process.env.MICROSOFT_APP_ID,
     appPassword: process.env.MICROSOFT_APP_PASSWORD
 });
 
-//listen for messages from users
 server.post('/api/messages', connector.listen());
-
 var inMemoryStorage = new builder.MemoryBotStorage();
-
-
-/** exercice 3 chat avec option recupérer d'un json. **/
-
 var bot = new builder.UniversalBot(connector, [
-    function (session) { // lancer la session de discussion
-        session.beginDialog('menu');
+    function (session) {
+        //Lancement du premier dialogue 'greetings'
+        session.send(`Welcome to the chatbot Space X, How can i help you ?`);
+        session.beginDialog('menu', session.userData.profile);
     }
-
 ]).set('storage', inMemoryStorage);
-
-/**
- * Mesage d'accueil lors de la connexion
- */
 
 bot.on('conversationUpdate', function (message) {
     if (message.membersAdded) {
@@ -44,245 +39,291 @@ bot.on('conversationUpdate', function (message) {
             }
         });
     }
-    else if (message.membersRemoved) {
-        // See if bot was removed
-        var botId = message.address.bot.id;
-        for (var i = 0; i < message.membersRemoved.length; i++) {
-            if (message.membersRemoved[i].id === botId) {
-                // Say goodbye
-                reply = new builder.Message()
-                    .address(message.address)
-                    .text("Goodbye");
-                bot.send(reply);
-                break;
-            }
-        }
-    }
 });
 
-
-const menuItems = { // json des différentes options
-    "Company Info": {
-        item: "option1"
+var menuItems = {
+    "About SpaceX": {
+        item: "getCompanyInfo",
     },
-    "Last launch": {
-        item: "option2"
+    "Latest launch": {
+        item: "latestLaunch",
     },
-    "All past launch": {
-        item: "option3"
+    "All successuful launches": {
+        item: "successufulLaunches",
     },
-    "All upcoming launch": {
-        item: "option4"
-    },
-    "All launch": {
-        item: "option5"
-    }
 };
 
 bot.dialog('menu', [
-    // Step 1
+    //step 1    
     function (session) {
-
-        //builder.Prompt.text(session, 'Welcome to the chatbot Space X Morray');
-        session.send("Welcome to the chatbot Space X Morray");
         builder.Prompts.choice(session,
-            "Launch menu",
+            "Voilà ce que je peux faire pour toi",
             menuItems,
-            {listStyle: 3})
+            { listStyle: 3 }
+        );
     },
-    //Step 2
+    //step 2
     function (session, results) {
         var choice = results.response.entity;
         session.beginDialog(menuItems[choice].item);
-        //session.beginDialog('welcome');
-
     }
 ]);
 
-bot.dialog('welcome', [
-    function (session) {
-        builder.Prompt.text(session, 'Welcome to the chatbot Space X Morray');
-    }
-]);
-
-bot.dialog('option1', [
+bot.dialog('getCompanyInfo', [
     function (session) {
         SpaceX.getCompanyInfo(function (err, info) {
-
-            /*
-           var card = {
+            var cardCompanyInfo = {
                 "attachments": [
                     {
                         "contentType": "application/vnd.microsoft.card.adaptive",
                         "content": {
+                            "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
                             "type": "AdaptiveCard",
                             "version": "1.0",
                             "body": [
                                 {
-                                    "type": "TextBlock",
-                                    "text": "Company Info",
-                                    "size": "large"
+                                    "type": "Container",
+                                    "items": [
+                                        {
+                                            "type": "TextBlock",
+                                            "text": "Space X - Info Company",
+                                            "weight": "bolder",
+                                            "size": "medium"
+                                        },
+                                        {
+                                            "type": "ColumnSet",
+                                            "columns": [
+                                                {
+                                                    "type": "Column",
+                                                    "width": "auto",
+                                                    "items": [
+                                                        {
+                                                            "type": "Image",
+                                                            "url": "https://cdn2.hubspot.net/hub/250707/hubfs/Blog_Images/100_entrepreneurs_lessons_advice/elon_musk.png?t=1448928230514&width=300&height=300",
+                                                            "size": "small",
+                                                            "style": "person"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "type": "Column",
+                                                    "width": "stretch",
+                                                    "items": [
+                                                        {
+                                                            "type": "TextBlock",
+                                                            "text": "Founder : "+info.founder,
+                                                            "weight": "bolder",
+                                                            "wrap": true
+                                                        },
+                                                        {
+                                                            "type": "TextBlock",
+                                                            "spacing": "none",
+                                                            "text": "Created {{DATE(2002-03-02T06:08:39Z, SHORT)}}",
+                                                            "isSubtle": true,
+                                                            "wrap": true
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
                                 },
                                 {
-                                    "type": "TextBlock",
-                                    "text": info.name,
-                                },
-                                {
-                                    "type": "TextBlock",
-                                    "text": "Adaptive Cards",
-                                    "separation": "none"
+                                    "type": "Container",
+                                    "items": [
+                                        {
+                                            "type": "TextBlock",
+                                            "text": info.summary,
+                                            "wrap": true
+                                        },
+                                        {
+                                            "type": "FactSet",
+                                            "facts": [
+                                                {
+                                                    "title": "Adress:",
+                                                    "value": info.headquarters.address+', '+info.headquarters.city+', '+info.headquarters.state,
+                                                },
+                                                {
+                                                    "title": "Employees:",
+                                                    "value": info.employees,
+                                                },
+                                                {
+                                                    "title": "Launch sites:",
+                                                    "value": info.launch_sites,
+                                                },
+                                                {
+                                                    "title": "Vehicles:",
+                                                    "value": info.vehicles,
+                                                }
+                                            ]
+                                        }
+                                    ]
                                 }
                             ],
                             "actions": [
                                 {
                                     "type": "Action.OpenUrl",
-                                    "url": "http://adaptivecards.io",
-                                    "title": "Learn More"
+                                    "title": "More details",
+                                    "url": "http://www.spacex.com/"
                                 }
                             ]
                         }
                     }
                 ]
             };
-            */
-            var cardCompanyInfo = {
-                    "attachments": [
-                        {
-                            "contentType": "application/vnd.microsoft.card.adaptive",
-                            "content": {
-                                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-                                "type": "AdaptiveCard",
-                                "version": "1.0",
-                                "body": [
+            session.send(cardCompanyInfo);
+        });
+    }
+]);
+bot.dialog('latestLaunch', [
+    function (session) {
+        session.sendTyping();
+        SpaceX.getLatestLaunch(function (err, launch) {
+            var adaptiveCardMessage = buildLaunchAdaptiveCard(launch, session);
+            // session.send(JSON.stringify(launch));
+            session.send(adaptiveCardMessage);
+        });
+    },
+]);
+
+bot.dialog('successufulLaunches', [
+    function (session) {
+        session.sendTyping();
+        SpaceX.getAllLaunches({ launch_success: true }, function (err, launches) {
+            session.send(JSON.stringify(launches));
+        });
+    },
+]);
+
+function buildLaunchAdaptiveCard(launch, session) {
+    var adaptiveCardMessage = new builder.Message(session)
+        .addAttachment({
+            contentType: "application/vnd.microsoft.card.adaptive",
+            content: {
+                type: "AdaptiveCard",
+                body: [
+                    {
+                        "type": "Container",
+                        "items": [
+                            {
+                                "type": "TextBlock",
+                                "text": launch.mission_name,
+                                "weight": "bolder",
+                                "size": "medium"
+                            },
+                            {
+                                "type": "ColumnSet",
+                                "columns": [
                                     {
-                                        "type": "Container",
+                                        "type": "Column",
+                                        "width": "auto",
                                         "items": [
                                             {
-                                                "type": "TextBlock",
-                                                "text": "Space X - Info Company",
-                                                "weight": "bolder",
-                                                "size": "medium"
-                                            },
-                                            {
-                                                "type": "ColumnSet",
-                                                "columns": [
-                                                    {
-                                                        "type": "Column",
-                                                        "width": "auto",
-                                                        "items": [
-                                                            {
-                                                                "type": "Image",
-                                                                "url": "https://cdn2.hubspot.net/hub/250707/hubfs/Blog_Images/100_entrepreneurs_lessons_advice/elon_musk.png?t=1448928230514&width=300&height=300",
-                                                                "size": "small",
-                                                                "style": "person"
-                                                            }
-                                                        ]
-                                                    },
-                                                    {
-                                                        "type": "Column",
-                                                        "width": "stretch",
-                                                        "items": [
-                                                            {
-                                                                "type": "TextBlock",
-                                                                "text": "Founder : "+info.founder,
-                                                                "weight": "bolder",
-                                                                "wrap": true
-                                                            },
-                                                            {
-                                                                "type": "TextBlock",
-                                                                "spacing": "none",
-                                                                "text": "Created {{DATE(2002-03-02T06:08:39Z, SHORT)}}",
-                                                                "isSubtle": true,
-                                                                "wrap": true
-                                                            }
-                                                        ]
-                                                    }
-                                                ]
+                                                "type": "Image",
+                                                "url": launch.links.mission_patch_small,
+                                                "size": "small",
+                                                "style": "person"
                                             }
                                         ]
                                     },
                                     {
-                                        "type": "Container",
+                                        "type": "Column",
+                                        "width": "stretch",
                                         "items": [
                                             {
                                                 "type": "TextBlock",
-                                                "text": info.summary,
+                                                "text": "Matt Hidinger",
+                                                "weight": "bolder",
                                                 "wrap": true
                                             },
                                             {
-                                                "type": "FactSet",
-                                                "facts": [
-                                                    {
-                                                        "title": "Adress:",
-                                                        "value": info.headquarters.address+', '+info.headquarters.city+', '+info.headquarters.state,
-                                                    },
-                                                    {
-                                                        "title": "Employees:",
-                                                        "value": info.employees,
-                                                    },
-                                                    {
-                                                        "title": "Launch sites:",
-                                                        "value": info.launch_sites,
-                                                    },
-                                                    {
-                                                        "title": "Vehicles:",
-                                                        "value": info.vehicles,
-                                                    }
-                                                ]
+                                                "type": "TextBlock",
+                                                "spacing": "none",
+                                                "text": "Created {{DATE(2017-02-14T06:08:39Z, SHORT)}}",
+                                                "isSubtle": true,
+                                                "wrap": true
                                             }
                                         ]
                                     }
-                                ],
-                                "actions": [
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "type": "Container",
+                        "items": [
+                            {
+                                "type": "TextBlock",
+                                "text": "Now that we have defined the main rules and features of the format, we need to produce a schema and publish it to GitHub. The schema will be the starting point of our reference documentation.",
+                                "wrap": true
+                            },
+                            {
+                                "type": "FactSet",
+                                "facts": [
                                     {
-                                        "type": "Action.OpenUrl",
-                                        "title": "More details",
-                                        "url": "http://www.spacex.com/"
+                                        "title": "Board:",
+                                        "value": "Adaptive Card"
+                                    },
+                                    {
+                                        "title": "List:",
+                                        "value": "Backlog"
+                                    },
+                                    {
+                                        "title": "Assigned to:",
+                                        "value": "Matt Hidinger"
+                                    },
+                                    {
+                                        "title": "Due date:",
+                                        "value": "Not set"
                                     }
                                 ]
                             }
+                        ]
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "Action.ShowCard",
+                        "title": "Set due date",
+                        "card": {
+                            "type": "AdaptiveCard",
+                            "body": [
+                                {
+                                    "type": "Input.Date",
+                                    "id": "dueDate"
+                                }
+                            ],
+                            "actions": [
+                                {
+                                    "type": "Action.Submit",
+                                    "title": "OK"
+                                }
+                            ]
                         }
-                    ]
-                };
-
-            //session.send(card);
-            session.send(cardCompanyInfo);
-            //session.send(JSON.stringify(info));
+                    },
+                    {
+                        "type": "Action.ShowCard",
+                        "title": "Comment",
+                        "card": {
+                            "type": "AdaptiveCard",
+                            "body": [
+                                {
+                                    "type": "Input.Text",
+                                    "id": "comment",
+                                    "isMultiline": true,
+                                    "placeholder": "Enter your comment"
+                                }
+                            ],
+                            "actions": [
+                                {
+                                    "type": "Action.Submit",
+                                    "title": "OK"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
         });
-    }
-]);
-
-bot.dialog('option2', [
-    function (session) {
-        SpaceX.getLatestLaunch(function (err, info) {
-            session.send(info)
-        });
-    }
-]);
-
-bot.dialog('option3', [
-    function (session) {
-        SpaceX.getAllPastLaunches({}, function (err, info) {
-
-            var msg = new builder.Message(session).addAttachment(card);
-            session.send(msg);
-            session.send(JSON.stringify(info))
-        });
-    }
-]);
-
-bot.dialog('option4', [
-    function (session) {
-        SpaceX.getAllUpcomingLaunches({}, function (err, info) {
-            session.send(info)
-        });
-    }
-]);
-
-bot.dialog('option5', [
-    function (session) {
-        SpaceX.getCompanyInfo(function (err, info) {
-            session.send(JSON.stringify(info));
-        });
-    }
-]);
+        return adaptiveCardMessage;
+}
