@@ -1,5 +1,5 @@
 {
-  "name": "spacex_chatbot",
+  "name": "bot_framework",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -9,10 +9,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "adaptivecards": "^1.0.0",
     "botbuilder": "^3.15.0",
-    "dotenv": "^5.0.1",
+    "dotenv": "^6.0.0",
+    "request": "^2.87.0",
     "restify": "^7.2.1",
-    "spacex-api-wrapper": "^1.0.1"
+    "spacex-api-wrapper": "^1.0.1",
+    "url": "^0.11.0"
   },
   "devDependencies": {},
   "repository": {
