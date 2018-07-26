@@ -49,8 +49,8 @@ var menuItems = {
     "Latest launch": {
         item: "latestLaunch",
     },
-    "Next launch": {
-        item: "nextLaunch",
+    "Core Part": {
+        item: "corePart",
     },
     "All successuful launches": {
         item: "successufulLaunches",
@@ -179,13 +179,103 @@ bot.dialog('getCompanyInfo', [
         });
     }
 ]);
-bot.dialog('nextLaunch', [
+
+bot.dialog('corePart', [
     function (session) {
         session.sendTyping();
-        SpaceX.getNextLaunch(function (err, launch) {
-            var adaptiveCardMessage = buildLaunchAdaptiveCard(launch, session);
-            session.send(JSON.stringify(launch));
-            //session.send(adaptiveCardMessage);
+        SpaceX.getCorePart(function (err, info) {
+            var cardCorePart = {
+                "attachments": [
+                    {
+                        "contentType": "application/vnd.microsoft.card.adaptive",
+                        "content": {
+                            "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                            "type": "AdaptiveCard",
+                            "version": "1.0",
+                            "body": [
+                                {
+                                    "type": "Container",
+                                    "items": [
+                                        {
+                                            "type": "TextBlock",
+                                            "text": "Space X - Core Part",
+                                            "weight": "bolder",
+                                            "size": "medium"
+                                        },
+                                        {
+                                            "type": "ColumnSet",
+                                            "columns": [
+                                                {
+                                                    "type": "Column",
+                                                    "width": "auto",
+                                                    "items": [
+                                                        {
+                                                            "type": "Image",
+                                                            "url": "https://cdn2.hubspot.net/hub/250707/hubfs/Blog_Images/100_entrepreneurs_lessons_advice/elon_musk.png?t=1448928230514&width=300&height=300",
+                                                            "size": "small",
+                                                            "style": "person"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "type": "Column",
+                                                    "width": "stretch",
+                                                    "items": [
+                                                        {
+                                                            "type": "TextBlock",
+                                                            "text": "core serial : "+ "ok",//info.core_serial,
+                                                            "weight": "bolder",
+                                                            "wrap": true
+                                                        },
+                                                        {
+                                                            "type": "TextBlock",
+                                                            "spacing": "none",
+                                                            "text": "Created {{DATE(2002-03-02T06:08:39Z, SHORT)}}",
+                                                            "isSubtle": true,
+                                                            "wrap": true
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "Container",
+                                    "items": [
+                                        {
+                                            "type": "TextBlock",
+                                            "status": "ok", //info.status,
+                                            "wrap": true
+                                        },
+                                        {
+                                            "type": "FactSet",
+                                            "facts": [
+                                                {
+                                                    "title": "Details:",
+                                                    "details": "ok" //info.details,
+                                                },
+                                                {
+                                                    "title": "original_launch",
+                                                    "original launch": "ok" //info.original_launch
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ],
+                            "actions": [
+                                {
+                                    "type": "Action.OpenUrl",
+                                    "title": "More details",
+                                    "url": "http://www.spacex.com/"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            };
+            session.send(cardCorePart);
         });
     },
 ]);
