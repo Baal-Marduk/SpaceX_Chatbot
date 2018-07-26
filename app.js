@@ -247,14 +247,14 @@ function buildLaunchAdaptiveCard(launch, session) {
                                         "items": [
                                             {
                                                 "type": "TextBlock",
-                                                "text": "Matt Hidinger",
+                                                "text": "Flight number : "+launch.flight_number,
                                                 "weight": "bolder",
                                                 "wrap": true
                                             },
                                             {
                                                 "type": "TextBlock",
                                                 "spacing": "none",
-                                                "text": "Created {{DATE(2017-02-14T06:08:39Z, SHORT)}}",
+                                                "text": "Launched {{DATE("+launch.launch_date_local+", SHORT)}}",
                                                 "isSubtle": true,
                                                 "wrap": true
                                             }
@@ -268,29 +268,21 @@ function buildLaunchAdaptiveCard(launch, session) {
                         "type": "Container",
                         "items": [
                             {
-                                "type": "TextBlock",
-                                "text": "Now that we have defined the main rules and features of the format, we need to produce a schema and publish it to GitHub. The schema will be the starting point of our reference documentation.",
-                                "wrap": true
-                            },
-                            {
                                 "type": "FactSet",
                                 "facts": [
                                     {
-                                        "title": "Board:",
-                                        "value": "Adaptive Card"
+                                        "title": "Rocket type:",
+                                        "value": launch.rocket.rocket_name
                                     },
                                     {
-                                        "title": "List:",
-                                        "value": "Backlog"
+                                        "title": "Sucess:",
+                                        "value": launch.launch_success
                                     },
                                     {
-                                        "title": "Assigned to:",
-                                        "value": "Matt Hidinger"
-                                    },
-                                    {
-                                        "title": "Due date:",
-                                        "value": "Not set"
+                                        "title": "Launch site:",
+                                        "value": launch.launch_site.site_name
                                     }
+                    
                                 ]
                             }
                         ]
@@ -298,43 +290,46 @@ function buildLaunchAdaptiveCard(launch, session) {
                 ],
                 "actions": [
                     {
-                        "type": "Action.ShowCard",
-                        "title": "Set due date",
-                        "card": {
-                            "type": "AdaptiveCard",
-                            "body": [
-                                {
-                                    "type": "Input.Date",
-                                    "id": "dueDate"
-                                }
-                            ],
-                            "actions": [
-                                {
-                                    "type": "Action.Submit",
-                                    "title": "OK"
-                                }
-                            ]
-                        }
+                        "type": "Action.OpenUrl",
+                        "title": "Video link",
+                        "url": launch.links.video_link
                     },
                     {
                         "type": "Action.ShowCard",
-                        "title": "Comment",
+                        "title": "Payloads",
                         "card": {
                             "type": "AdaptiveCard",
                             "body": [
                                 {
-                                    "type": "Input.Text",
+                                    "type": "TextBlock",
                                     "id": "comment",
                                     "isMultiline": true,
                                     "placeholder": "Enter your comment"
+                                },
+                                {
+                                    "type": "Container",
+                                    "items": [
+                                        {
+                                            "type": "FactSet",
+                                            "facts": [
+                                                {
+                                                    "title": "Payload type: ",
+                                                    "value": launch.rocket.second_stage.payloads[0].payload_type
+                                                },
+                                                {
+                                                    "title": "Payload mass: ",
+                                                    "value": launch.rocket.second_stage.payloads[0].payload_mass_kg
+                                                },
+                                                {
+                                                    "title": "Orbit: ",
+                                                    "value": launch.rocket.second_stage.payloads[0].orbit
+                                                }
+                                
+                                            ]
+                                        }
+                                    ]
                                 }
                             ],
-                            "actions": [
-                                {
-                                    "type": "Action.Submit",
-                                    "title": "OK"
-                                }
-                            ]
                         }
                     }
                 ]
